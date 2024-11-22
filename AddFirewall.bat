@@ -30,36 +30,60 @@ setlocal enabledelayedexpansion
 :menu
 cls
 echo ==============================================
-echo Firewall Rule Adder
+echo Firewall Rule Blocker
 echo ==============================================
-echo 1) Add firewall rules for all files in the current folder
-echo 2) Add firewall rules for all .exe files in the current folder
-echo 3) Exit
+echo 1) Block inbound rules for all .exe files in the current folder
+echo 2) Block inbound rules for all files in the current folder
+echo 3) Block outbound rules for all .exe files in the current folder
+echo 4) Block outbound rules for all files in the current folder
+echo 5) Exit
 echo ==============================================
-set /p choice="Choose an option (1-3): "
+set /p choice="Choose an option (1-5): "
 
-if "%choice%"=="1" goto add_all_files
-if "%choice%"=="2" goto add_exe_files
-if "%choice%"=="3" exit
+if "%choice%"=="1" goto block_exe_inbound
+if "%choice%"=="2" goto block_all_files_inbound
+if "%choice%"=="3" goto block_exe_outbound
+if "%choice%"=="4" goto block_all_files_outbound
+if "%choice%"=="5" exit
 echo Invalid choice! Please try again.
 pause
 goto menu
 
-:add_all_files
-echo Adding firewall rules for all files in the current folder...
-for %%F in (*) do (
-    echo Adding firewall rule for %%F
-    netsh advfirewall firewall add rule name="Allow %%~nF" dir=in action=allow program="%cd%\%%F" enable=yes
+:block_exe_inbound
+echo Blocking inbound rules for all .exe files in the current folder...
+for %%F in (*.exe) do (
+    echo Blocking inbound rule for %%F
+    netsh advfirewall firewall add rule name="Block IN %%~nF" dir=in action=block program="%cd%\%%F" enable=yes
 )
 echo Done!
 pause
 goto menu
 
-:add_exe_files
-echo Adding firewall rules for all .exe files in the current folder...
+:block_all_files_inbound
+echo Blocking inbound rules for all files in the current folder...
+for %%F in (*) do (
+    echo Blocking inbound rule for %%F
+    netsh advfirewall firewall add rule name="Block IN %%~nF" dir=in action=block program="%cd%\%%F" enable=yes
+)
+echo Done!
+pause
+goto menu
+
+:block_exe_outbound
+echo Blocking outbound rules for all .exe files in the current folder...
 for %%F in (*.exe) do (
-    echo Adding firewall rule for %%F
-    netsh advfirewall firewall add rule name="Allow %%~nF" dir=in action=allow program="%cd%\%%F" enable=yes
+    echo Blocking outbound rule for %%F
+    netsh advfirewall firewall add rule name="Block OUT %%~nF" dir=out action=block program="%cd%\%%F" enable=yes
+)
+echo Done!
+pause
+goto menu
+
+:block_all_files_outbound
+echo Blocking outbound rules for all files in the current folder...
+for %%F in (*) do (
+    echo Blocking outbound rule for %%F
+    netsh advfirewall firewall add rule name="Block OUT %%~nF" dir=out action=block program="%cd%\%%F" enable=yes
 )
 echo Done!
 pause
